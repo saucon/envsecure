@@ -16,6 +16,8 @@ var rootCmd = &cobra.Command{
 envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_key.pem
 
 `,
+	SilenceErrors: false,
+	SilenceUsage:  false,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

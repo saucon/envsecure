@@ -21,6 +21,8 @@ RSA and AEAD algorithms. For example:
 
 envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_key.pem
 `,
+	SilenceErrors: false,
+	SilenceUsage:  false,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath, err := cmd.Flags().GetString("file")
 		if err != nil {

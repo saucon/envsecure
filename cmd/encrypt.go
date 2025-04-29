@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"github.com/saucon/envsecure/pkg/encrypt"
 	"github.com/saucon/sauron/v2/pkg/secure"
 	"github.com/spf13/cobra"
@@ -23,24 +24,24 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 	Run: func(cmd *cobra.Command, args []string) {
 		filePath, err := cmd.Flags().GetString("file")
 		if err != nil {
-			cmd.Println(err)
+			cmd.PrintErr(err)
 			return
 		}
 
 		key, err := cmd.Flags().GetString("key")
 		if err != nil {
-			cmd.Println(err)
+			cmd.PrintErr(err)
 			return
 		}
 
 		keyFile, err := cmd.Flags().GetString("keyfile")
 		if err != nil {
-			cmd.Println(err)
+			cmd.PrintErr(err)
 			return
 		}
 		algo, err := cmd.Flags().GetString("algo")
 		if err != nil {
-			cmd.Println(err)
+			cmd.PrintErr(err)
 			return
 		}
 
@@ -54,23 +55,23 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 			secureAlgo = secure.NewSecureRSA()
 			fileBytes, err := os.ReadFile(keyFile)
 			if err != nil {
-				cmd.Println("error read key file", err)
+				cmd.PrintErr(errors.New("error read key file, " + err.Error()))
 				return
 			}
 			keySecret = string(fileBytes)
 		default:
-			cmd.Println("invalid algorithm. Options: aead, rsa")
+			cmd.PrintErr(errors.New("invalid algorithm. Options: aead, rsa"))
 			return
 		}
 
 		if keySecret == "" {
-			cmd.Println("key cannot be empty")
+			cmd.PrintErr(errors.New("key or keyfile is required"))
 			return
 		}
 
 		err = encrypt.EncryptEnv(secureAlgo, filePath, keySecret)
 		if err != nil {
-			cmd.Println(err)
+			cmd.PrintErr(err)
 			return
 		}
 

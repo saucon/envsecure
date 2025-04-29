@@ -86,7 +86,7 @@ func TestRootCmdEmptyKey(t *testing.T) {
 	t.Log(outputString)
 
 	// Assert no errors occurred
-	assert.NoError(t, err)
+	assert.Error(t, err)
 
 	// Assert the output contains the expected message
 	assert.Contains(t, output.String(), "error read key file")
@@ -116,7 +116,7 @@ func TestRootCmdEmptyFile(t *testing.T) {
 	t.Log(outputString)
 
 	// Assert no errors occurred
-	assert.NoError(t, err)
+	assert.Error(t, err)
 
 	// Assert the output contains the expected message
 	assert.Contains(t, output.String(), "error reading file")

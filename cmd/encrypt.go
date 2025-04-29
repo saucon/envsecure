@@ -21,28 +21,24 @@ RSA and AEAD algorithms. For example:
 
 envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_key.pem
 `,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath, err := cmd.Flags().GetString("file")
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		key, err := cmd.Flags().GetString("key")
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		keyFile, err := cmd.Flags().GetString("keyfile")
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 		algo, err := cmd.Flags().GetString("algo")
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		var keySecret string
@@ -55,31 +51,28 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 			secureAlgo = secure.NewSecureRSA()
 			fileBytes, err := os.ReadFile(keyFile)
 			if err != nil {
-				cmd.PrintErr(errors.New("error read key file, " + err.Error()))
-				return
+				return errors.New("error read key file, " + err.Error())
 			}
 			keySecret = string(fileBytes)
 		default:
-			cmd.PrintErr(errors.New("invalid algorithm. Options: aead, rsa"))
-			return
+			return err
 		}
 
 		if keySecret == "" {
-			cmd.PrintErr(errors.New("key or keyfile is required"))
-			return
+			return errors.New("error key or keyfile is required")
 		}
 
 		err = encrypt.EncryptEnv(secureAlgo, filePath, keySecret)
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		fp := strings.Split(filePath, "/")
 		filename := fp[len(fp)-1]
 
+		cmd.Println()
 		cmd.Println("Config encrypted and saved successfully. File: secure." + filename)
-		return
+		return nil
 	},
 }
 

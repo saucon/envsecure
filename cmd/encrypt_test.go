@@ -61,3 +61,63 @@ func TestRootCmdWithEncrypt(t *testing.T) {
 
 	assert.Equal(t, cfgSec, cfg)
 }
+
+func TestRootCmdEmptyKey(t *testing.T) {
+	// Create a buffer to capture the output
+	output := &bytes.Buffer{}
+	rootCmd.SetOut(output)
+	rootCmd.SetErr(output)
+
+	// Set up the arguments for the root command
+	rootCmd.SetArgs([]string{
+		"encrypt",
+		"--file", "../sample/env.sample.yml",
+		"--keyfile", "",
+		"--algo", "rsa",
+	})
+
+	// Execute the root command
+	err := rootCmd.Execute()
+
+	// dump the output
+	outputString := output.String()
+
+	// Print the captured output for debugging
+	t.Log(outputString)
+
+	// Assert no errors occurred
+	assert.NoError(t, err)
+
+	// Assert the output contains the expected message
+	assert.Contains(t, output.String(), "error read key file open")
+}
+
+func TestRootCmdEmptyFile(t *testing.T) {
+	// Create a buffer to capture the output
+	output := &bytes.Buffer{}
+	rootCmd.SetOut(output)
+	rootCmd.SetErr(output)
+
+	// Set up the arguments for the root command
+	rootCmd.SetArgs([]string{
+		"encrypt",
+		"--file", "",
+		"--keyfile", "../sample/public_key.pem",
+		"--algo", "rsa",
+	})
+
+	// Execute the root command
+	err := rootCmd.Execute()
+
+	// dump the output
+	outputString := output.String()
+
+	// Print the captured output for debugging
+	t.Log(outputString)
+
+	// Assert no errors occurred
+	assert.NoError(t, err)
+
+	// Assert the output contains the expected message
+	assert.Contains(t, output.String(), "error reading file")
+}

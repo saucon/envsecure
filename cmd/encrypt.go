@@ -4,7 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/saucon/sauron/v2/pkg/env"
+	"github.com/saucon/envsecure/pkg/encrypt"
 	"github.com/saucon/sauron/v2/pkg/secure"
 	"github.com/spf13/cobra"
 	"os"
@@ -45,7 +45,7 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 		}
 
 		var keySecret string
-		var secureAlgo Secure
+		var secureAlgo secure.Secure
 		switch algo {
 		case "aead":
 			secureAlgo = secure.NewSecureAEAD()
@@ -54,11 +54,13 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 			secureAlgo = secure.NewSecureRSA()
 			fileBytes, err := os.ReadFile(keyFile)
 			if err != nil {
+				cmd.Println("error read key file", err)
 				return
 			}
 			keySecret = string(fileBytes)
 		default:
-			cmd.Println("Invalid algorithm. Options: aead, rsa")
+			cmd.Println("invalid algorithm. Options: aead, rsa")
+			return
 		}
 
 		if keySecret == "" {
@@ -66,9 +68,9 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 			return
 		}
 
-		err = env.EncryptEnv(secureAlgo, filePath, keySecret)
+		err = encrypt.EncryptEnv(secureAlgo, filePath, keySecret)
 		if err != nil {
-			cmd.Println("error encrypt config", err)
+			cmd.Println(err)
 			return
 		}
 
@@ -93,7 +95,7 @@ func init() {
 	// is called directly, e.g.:
 	// encryptCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	encryptCmd.Flags().StringP("file", "f", "", "File to encrypt")
+	encryptCmd.Flags().StringP("file", "f", "", "File to encrypt. This file contains the config with plain text")
 	encryptCmd.MarkFlagRequired("file")
 
 	encryptCmd.Flags().StringP("key", "k", "", "Encryption key")

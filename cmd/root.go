@@ -29,7 +29,7 @@ envsecure encrypt -f sample/env.sample.yml --algo rsa --keyfile sample/public_ke
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
